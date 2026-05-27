@@ -199,6 +199,16 @@ app.post('/api/analyze-disease', async (req, res) => {
   }
 });
 
+app.get('/api/list-models', async (req, res) => {
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ================= SOCKET.IO =================
 io.on('connection', (socket) => {
   console.log('User connected to WebSockets:', socket.id);
