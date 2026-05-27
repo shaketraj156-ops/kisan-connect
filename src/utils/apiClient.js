@@ -1,7 +1,8 @@
 // API Client for interacting with the Express Backend
+const API_BASE_URL = 'https://kisan-connect-lzul.onrender.com';
 
 export const loginUser = async (userData) => {
-  const response = await fetch('/api/login', {
+  const response = await fetch(`${API_BASE_URL}/api/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(userData)
@@ -11,13 +12,15 @@ export const loginUser = async (userData) => {
 };
 
 export const fetchListings = async () => {
-  const response = await fetch('/api/listings');
+  const response = await fetch(`${API_BASE_URL}/api/listings`, {
+    headers: { 'Bypass-Tunnel-Reminder': 'true' }
+  });
   if (!response.ok) throw new Error('Failed to fetch listings');
   return response.json();
 };
 
 export const createListing = async (listingData) => {
-  const response = await fetch('/api/listings', {
+  const response = await fetch(`${API_BASE_URL}/api/listings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(listingData)
@@ -27,7 +30,7 @@ export const createListing = async (listingData) => {
 };
 
 export const deleteListing = async (id) => {
-  const response = await fetch(`/api/listings/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/listings/${id}`, {
     method: 'DELETE'
   });
   if (!response.ok) throw new Error('Failed to delete listing');
@@ -35,13 +38,15 @@ export const deleteListing = async (id) => {
 };
 
 export const fetchChats = async (userId) => {
-  const response = await fetch(`/api/chats/${userId}`);
+  const response = await fetch(`${API_BASE_URL}/api/chats/${userId}`, {
+    headers: { 'Bypass-Tunnel-Reminder': 'true' }
+  });
   if (!response.ok) throw new Error('Failed to fetch chats');
   return response.json();
 };
 
 export const openOrCreateChat = async (chatData) => {
-  const response = await fetch('/api/chats', {
+  const response = await fetch(`${API_BASE_URL}/api/chats`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(chatData)
@@ -51,7 +56,7 @@ export const openOrCreateChat = async (chatData) => {
 };
 
 export const sendMessage = async (chatId, messageData) => {
-  const response = await fetch(`/api/chats/${chatId}/message`, {
+  const response = await fetch(`${API_BASE_URL}/api/chats/${chatId}/message`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(messageData)

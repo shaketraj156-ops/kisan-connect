@@ -20,11 +20,13 @@ export default function ChatSystem({ activeChat, user, onUpdateChat, onClose }) 
   // Setup Socket.io
   useEffect(() => {
     // Determine backend URL
-    const backendUrl = window.location.hostname === 'localhost' 
-      ? 'http://localhost:5000' 
-      : `http://${window.location.hostname}:5000`; // fallback for local network IP
+    const backendUrl = 'https://kisan-connect-lzul.onrender.com';
       
-    socketRef.current = io(backendUrl);
+    socketRef.current = io(backendUrl, {
+      extraHeaders: {
+        'Bypass-Tunnel-Reminder': 'true'
+      }
+    });
 
     socketRef.current.emit('join_chat', activeChat._id);
 

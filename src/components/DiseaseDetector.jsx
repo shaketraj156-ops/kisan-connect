@@ -38,7 +38,7 @@ export default function DiseaseDetector() {
         ctx.drawImage(imgRef.current, 0, 0);
         const base64Data = canvas.toDataURL("image/jpeg");
 
-        const response = await fetch('http://localhost:5000/api/analyze-disease', {
+        const response = await fetch('https://kisan-connect-lzul.onrender.com/api/analyze-disease', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
