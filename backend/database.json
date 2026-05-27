@@ -1,0 +1,124 @@
+{
+  "users": [
+    {
+      "_id": "hrexfgz5l",
+      "name": "shaket",
+      "phone": "9334286084",
+      "location": "bhopal",
+      "role": "buyer"
+    },
+    {
+      "_id": "qs8f9atrt",
+      "name": "Shashank Tyagi ",
+      "phone": "9691092704",
+      "location": "Morena",
+      "role": "farmer"
+    },
+    {
+      "_id": "2a8bd1066",
+      "name": "saket",
+      "phone": "9334286084",
+      "location": "bhopal",
+      "role": "farmer"
+    },
+    {
+      "_id": "j67ac005p",
+      "name": "asmdasd",
+      "phone": "8432948239",
+      "location": "3i4309434",
+      "role": "farmer"
+    },
+    {
+      "_id": "uwokz70uw",
+      "name": "Harshit yadav ",
+      "phone": "9235104238",
+      "location": "Purwa",
+      "role": "farmer"
+    },
+    {
+      "_id": "488edi45k",
+      "name": "Shaket Kumar",
+      "phone": "9162751302",
+      "location": "Nawada Bihar",
+      "role": "farmer"
+    },
+    {
+      "_id": "pfz674o3t",
+      "name": "saket",
+      "phone": "7004927544",
+      "location": "Gaya Bihar",
+      "role": "farmer"
+    },
+    {
+      "_id": "mv6owkuzi",
+      "name": "SHAMBHAV RAJ",
+      "phone": "7061105614",
+      "location": "Nawada Bihar",
+      "role": "buyer"
+    }
+  ],
+  "listings": [
+    {
+      "farmerId": "qs8f9atrt",
+      "farmerName": "Shashank Tyagi ",
+      "crop": "Wheat (Kanak)",
+      "quantity": 1000,
+      "askingPrice": 3000,
+      "location": "Morena",
+      "contact": "9691092704",
+      "grade": "Grade A Premium",
+      "shareTruckPool": true,
+      "_id": "akxx7om27"
+    }
+  ],
+  "chats": [
+    {
+      "_id": "08upm0s7o",
+      "buyerId": "hrexfgz5l",
+      "buyerName": "shaket",
+      "farmerId": "qs8f9atrt",
+      "farmerName": "Shashank Tyagi ",
+      "listingId": "akxx7om27",
+      "crop": "Wheat (Kanak)",
+      "askingPrice": 3000,
+      "mandiPrice": 2950,
+      "messages": [
+        {
+          "sender": "buyer",
+          "text": "Ram Ram Shashank Tyagi  ji! Main aapka Wheat (Kanak) dekh raha tha. Quality kaisa hai?",
+          "timestamp": "01:25 PM"
+        },
+        {
+          "sender": "buyer",
+          "text": "hii",
+          "timestamp": "01:25 PM"
+        },
+        {
+          "sender": "farmer",
+          "text": "Ji bhaiya, anaj bilkul natural aur organic tarike se ugaya hai. Aap aake dekh sakte hain.",
+          "timestamp": "01:25 PM"
+        },
+        {
+          "sender": "buyer",
+          "text": "hello",
+          "timestamp": "01:25 PM"
+        },
+        {
+          "sender": "farmer",
+          "text": "Ji bhaiya, anaj bilkul natural aur organic tarike se ugaya hai. Aap aake dekh sakte hain.",
+          "timestamp": "01:25 PM"
+        },
+        {
+          "sender": "buyer",
+          "text": "hii",
+          "timestamp": "11:30 pm"
+        },
+        {
+          "sender": "farmer",
+          "text": "Ji bhaiya, anaj bilkul natural aur organic tarike se ugaya hai. Aap aake dekh sakte hain.",
+          "timestamp": "11:30 pm"
+        }
+      ]
+    }
+  ]
+}
