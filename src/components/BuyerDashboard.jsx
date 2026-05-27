@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, MapPin, DollarSign, Filter, MessageSquare, Phone, Truck, User, Eye, X, Image as ImageIcon, CreditCard, CheckCircle, Map as MapIcon, Navigation } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { openOrCreateChat } from '../utils/apiClient';
 
 export default function BuyerDashboard({ user, listings, onOpenChat, activeChats, onAddTransaction, transactions = [] }) {
   const { t } = useLanguage();
@@ -46,7 +47,6 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
       onOpenChat(existingChat);
     } else {
       try {
-        const { openOrCreateChat } = await import('../utils/apiClient.js');
         const newChatData = {
           buyerId: user._id,
           buyerName: user.name,
