@@ -219,10 +219,12 @@ body {
 @media (max-width: 768px) {
   /* Navbar Overrides */
   nav.glass-panel {
+    display: flex !important;
     flex-direction: column !important;
-    gap: 8px !important;
-    padding: 10px !important;
-    border-radius: 0 0 12px 12px !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 15px 10px !important;
+    border-radius: 0 0 16px 16px !important;
   }
   
   .nav-brand {
@@ -231,33 +233,40 @@ body {
     margin-bottom: 5px;
   }
 
-  .nav-links, .user-menu {
+  .nav-links {
     width: 100% !important;
+    display: flex !important;
     justify-content: center !important;
-    flex-wrap: nowrap !important;
-    gap: 8px !important;
-    overflow-x: auto;
-    padding-bottom: 4px;
+    gap: 12px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 12px;
   }
 
-  .nav-links::-webkit-scrollbar, .user-menu::-webkit-scrollbar {
-    display: none;
+  .user-menu {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-wrap: nowrap !important;
   }
 
   nav.glass-panel button {
-    flex: 1 !important;
-    min-width: 0 !important;
-    padding: 6px 8px !important;
-    font-size: 0.85rem !important;
+    flex: 0 1 auto !important;
+    padding: 8px 14px !important;
+    font-size: 0.9rem !important;
     white-space: nowrap;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+    border-radius: 12px !important;
   }
   
   .user-info {
-    padding: 4px 8px !important;
+    padding: 8px 12px !important;
+    border-radius: 12px !important;
+    background: rgba(255,255,255,0.05) !important;
   }
 
   /* General Utility Classes for Mobile */
