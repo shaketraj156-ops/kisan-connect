@@ -114,12 +114,12 @@ export default function DiseaseDetector() {
         </div>
       </div>
 
-      <div style={styles.uploadCard}>
+      <label style={{ ...styles.uploadCard, display: 'block' }}>
         <input 
           type="file" 
-          accept="image/*" 
+          accept="image/*,capture=camera" 
           onChange={handleImageUpload}
-          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: isScanning ? 'not-allowed' : 'pointer', zIndex: 20 }}
+          style={{ display: 'none' }}
           disabled={isScanning}
         />
         
@@ -162,7 +162,7 @@ export default function DiseaseDetector() {
             )}
           </div>
         )}
-      </div>
+      </label>
 
       {errorMsg && !isScanning && (
         <div style={styles.errorCard}>

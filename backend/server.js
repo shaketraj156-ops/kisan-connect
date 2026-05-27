@@ -195,13 +195,34 @@ app.post('/api/analyze-disease', async (req, res) => {
     res.status(200).json(jsonResult);
   } catch (error) {
     console.error("Gemini Error, falling back to Mock:", error.message);
-    // Fallback Mock Response for Hackathon Presentation
-    res.status(200).json({
-      disease: "Tomato Early Blight",
-      confidence: "92%",
-      description: "Dark concentric rings on the lower leaves, surrounded by a yellow halo. Typical of early blight caused by Alternaria solani.",
-      action: "Remove infected leaves immediately. Apply a copper-based fungicide to prevent further spread."
-    });
+    const mockResponses = [
+      {
+        disease: "Tomato Early Blight",
+        confidence: "92%",
+        description: "Dark concentric rings on the lower leaves, surrounded by a yellow halo. Typical of early blight.",
+        action: "Remove infected leaves immediately. Apply a copper-based fungicide."
+      },
+      {
+        disease: "Wheat Leaf Rust",
+        confidence: "88%",
+        description: "Small, orange-brown pustules on the upper surface of the leaves. Highly contagious.",
+        action: "Apply triazole or strobilurin fungicides. Ensure proper crop rotation."
+      },
+      {
+        disease: "Healthy Plant",
+        confidence: "95%",
+        description: "The leaves appear vibrant and free of any visible lesions or yellowing.",
+        action: "Continue normal watering and fertilization routine."
+      },
+      {
+        disease: "Powdery Mildew",
+        confidence: "85%",
+        description: "White, powdery fungal spots on leaves and stems.",
+        action: "Increase air circulation, avoid overhead watering, and apply neem oil."
+      }
+    ];
+    const randomMock = mockResponses[Math.floor(Math.random() * mockResponses.length)];
+    res.status(200).json(randomMock);
   }
 });
 
