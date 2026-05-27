@@ -6,7 +6,7 @@ export default function Navbar({ user, onLogout, activeTab, setActiveTab }) {
   const { lang, toggleLanguage, t } = useLanguage();
   return (
     <nav style={styles.nav} className="glass-panel navbar">
-      <div style={styles.brand}>
+      <div style={styles.brand} className="nav-brand">
         <div style={styles.logoCircle}>
           <Leaf size={18} color="#fff" />
         </div>
@@ -14,7 +14,7 @@ export default function Navbar({ user, onLogout, activeTab, setActiveTab }) {
       </div>
 
       {user && setActiveTab && (
-        <div style={styles.navLinks}>
+        <div style={styles.navLinks} className="nav-links">
           <button 
             style={{
               ...styles.navBtn, 
@@ -60,8 +60,8 @@ export default function Navbar({ user, onLogout, activeTab, setActiveTab }) {
       )}
 
       {user && (
-        <div style={styles.userMenu}>
-          <div style={styles.userInfo}>
+        <div style={styles.userMenu} className="user-menu">
+          <div style={styles.userInfo} className="user-info">
             <div style={styles.userIcon}>
               {user.role === 'farmer' ? <Leaf size={14} color="var(--primary)" /> : <ShoppingBag size={14} color="var(--accent)" />}
             </div>
