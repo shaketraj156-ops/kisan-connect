@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Leaf, Plus, TrendingUp, AlertCircle, Truck, Phone, MapPin, DollarSign, Calendar, MessageSquare, Loader, Trash2 } from 'lucide-react';
 import WeatherWidget from './WeatherWidget';
 import { useLanguage } from '../contexts/LanguageContext';
+import { createListing } from '../utils/apiClient';
 
 const GOV_API_KEY = '579b464db66ec23bdd000001a44e89e8e38a4537575909cb6d2e957e';
 const GOV_RESOURCE_ID = '9ef84268-d588-465a-a308-a864a43d0070';
@@ -100,9 +101,33 @@ export default function SellerDashboard({ user, listings, onAddListing, onDelete
     let photoBase64 = null;
     if (photo) {
       photoBase64 = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(photo);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = Math.round((height *= MAX_WIDTH / width));
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = Math.round((width *= MAX_HEIGHT / height));
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.7)); // 70% quality compression
+        };
+        img.src = URL.createObjectURL(photo);
       });
     }
 
@@ -122,8 +147,6 @@ export default function SellerDashboard({ user, listings, onAddListing, onDelete
     };
 
     try {
-      // Import at the top of file is assumed, wait, let me use multi_replace to insert import
-      const { createListing } = await import('../utils/apiClient.js');
       const savedListing = await createListing(newListing);
       onAddListing(savedListing);
       // Reset form
