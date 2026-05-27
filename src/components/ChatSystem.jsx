@@ -61,45 +61,24 @@ export default function ChatSystem({ activeChat, user, onUpdateChat, onClose }) 
       // Emit via socket for instant sync
       socketRef.current.emit('send_message', { chatId: activeChat._id, message: msgData });
 
-      // 2. Trigger Smart Simulated AI response (MVP mock)
-      setTimeout(async () => {
-        let responseText = '';
-        const lowerMsg = userMsgText.toLowerCase();
-        
-        if (isFarmer) {
-          if (lowerMsg.includes('kam') || lowerMsg.includes('discount') || lowerMsg.includes('price')) {
-            responseText = "Aapka maal accha dikh raha hai. Agar hum pure 10 quintal ek sath utha lein, to kya aap ₹50 per quintal kam lagayenge?";
-          } else if (lowerMsg.includes('okay') || lowerMsg.includes('done') || lowerMsg.includes('ha')) {
-            responseText = "Bahut badiya! Deal pakki rahi fir. Main apna transport coordinator ka details share karta hu.";
-          } else {
-            responseText = "Theek hai, main quality check ke liye kal subah apna aadmi bhej sakta hu? Location verify kar dijiye.";
-          }
-        } else {
-          if (lowerMsg.includes('kam') || lowerMsg.includes('discount') || lowerMsg.includes('sasta')) {
-            responseText = "Bhaiya, ekdum super quality gehun hai, par chalo aap kisan se direct le rahe ho to ₹30/quintal aur kam kar deta hu.";
-          } else if (lowerMsg.includes('truck') || lowerMsg.includes('transport') || lowerMsg.includes('pool')) {
-            responseText = "Ji mere pass dusre farmers ke sath truck pooling ka option hai.";
-          } else if (lowerMsg.includes('ha') || lowerMsg.includes('done') || lowerMsg.includes('thik')) {
-            responseText = "Ram Ram! Bahut khushi hui deal finalize karke.";
-          } else {
-            responseText = "Ji bhaiya, anaj bilkul natural aur organic tarike se ugaya hai. Aap aake dekh sakte hain.";
-          }
-        }
-
-        const simMsgData = {
-          sender: isFarmer ? 'buyer' : 'farmer',
-          text: responseText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-        const simulatedChat = await sendApiMessage(activeChat._id, simMsgData);
-        onUpdateChat(simulatedChat);
-        socketRef.current.emit('send_message', { chatId: activeChat._id, message: simMsgData });
-      }, 1500);
-
     } catch (err) {
       console.error('Failed to send message:', err);
     }
   };
+
+  const farmerSuggestions = [
+    "Kya aap poora stock lenge?",
+    "Price thoda theek kar lijiye.",
+    "Transport aapka hoga ya mera?"
+  ];
+
+  const buyerSuggestions = [
+    "Bhaiya price thoda kam karo.",
+    "Quality check karne aa jau?",
+    "Truck pool kar sakte hain?"
+  ];
+
+  const currentSuggestions = isFarmer ? farmerSuggestions : buyerSuggestions;
 
   return (
     <div style={styles.chatBoxContainer} className="glass-panel animate-fade">
@@ -159,6 +138,23 @@ export default function ChatSystem({ activeChat, user, onUpdateChat, onClose }) 
           );
         })}
         <div ref={messagesEndRef} />
+      </div>
+
+      {/* Suggested Messages (Chips) */}
+      <div style={{ display: 'flex', gap: '8px', padding: '0 1rem 0.5rem 1rem', overflowX: 'auto', whiteSpace: 'nowrap', scrollbarWidth: 'none' }}>
+        {currentSuggestions.map((suggestion, idx) => (
+          <button 
+            key={idx} 
+            onClick={() => setInputText(suggestion)}
+            style={{
+              background: 'rgba(6, 182, 212, 0.1)', border: '1px solid rgba(6, 182, 212, 0.3)',
+              color: '#06b6d4', padding: '6px 12px', borderRadius: '16px', fontSize: '0.75rem',
+              cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0
+            }}
+          >
+            {suggestion}
+          </button>
+        ))}
       </div>
 
       {/* Input Form */}
