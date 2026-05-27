@@ -97,8 +97,14 @@ export default function SellerDashboard({ user, listings, onAddListing, onDelete
     
     setIsSubmitting(true);
 
-    // Convert file to object URL if it exists
-    const photoUrl = photo ? URL.createObjectURL(photo) : null;
+    let photoBase64 = null;
+    if (photo) {
+      photoBase64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(photo);
+      });
+    }
 
     const finalCropName = crop === 'Other' ? customCrop || 'Unknown Crop' : crop;
 
@@ -112,7 +118,7 @@ export default function SellerDashboard({ user, listings, onAddListing, onDelete
       contact: user.phone,
       grade,
       shareTruckPool: shareTruck,
-      photoUrl: photoUrl // NEW: Attach photo URL
+      photoUrl: photoBase64
     };
 
     try {
