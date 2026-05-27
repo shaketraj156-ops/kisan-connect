@@ -171,6 +171,13 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
             {filteredListings.map(listing => (
               <div key={listing.id} style={styles.listingCard} className="glass-panel">
                 
+                {/* Product Photo Thumbnail */}
+                {listing.photoUrl && (
+                  <div style={{ width: '100%', height: '140px', overflow: 'hidden', borderRadius: '12px 12px 0 0', marginBottom: '12px', background: 'rgba(0,0,0,0.2)' }}>
+                    <img src={listing.photoUrl} alt={listing.crop} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                )}
+
                 {/* Header */}
                 <div style={styles.cardTop}>
                   <div>
@@ -270,9 +277,9 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
             
             {/* Modal Image Area */}
             <div style={styles.modalImageContainer}>
-              {selectedListing.imageUrl ? (
+              {selectedListing.photoUrl ? (
                 <img 
-                  src={selectedListing.imageUrl} 
+                  src={selectedListing.photoUrl} 
                   alt={selectedListing.crop} 
                   style={styles.modalImage} 
                 />
