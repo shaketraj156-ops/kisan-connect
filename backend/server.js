@@ -162,9 +162,8 @@ app.post('/api/chats/:chatId/message', (req, res) => {
 app.post('/api/analyze-disease', async (req, res) => {
   try {
     const { imageBase64, mimeType } = req.body;
-    // Hardcode the API key for the MVP presentation
-    const genAI = new GoogleGenerativeAI("AIzaSyD61DvbDA6HPdS4fiQAPXEoZ7-gf6mAn0w");
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `You are an expert Indian Agronomist. 
     Analyze this image of a crop/plant.
