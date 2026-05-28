@@ -4,7 +4,7 @@ const LanguageContext = createContext();
 
 const translations = {
   en: {
-    "welcome": "Welcome to KisanConnect",
+    "welcome": "Welcome to FarmSpan",
     "login_farmer": "I am a Farmer / Seller",
     "login_buyer": "I am a Buyer / Merchant",
     "enter_name": "Enter your full name",
@@ -30,7 +30,7 @@ const translations = {
     "mobile_number": "Mobile Number",
     "location": "Location (City / State)",
     "connecting": "Connecting...",
-    "why_connect": "Why KisanConnect?",
+    "why_connect": "Why FarmSpan?",
     "search_marketplace": "Search & Filter Marketplace",
     "search_crop": "Enter Crop or Farmer Name",
     "filter_location": "Filter Location",
@@ -38,7 +38,7 @@ const translations = {
     "available_listings": "Available Farmer Listings"
   },
   hi: {
-    "welcome": "KisanConnect mein aapka swagat hai",
+    "welcome": "FarmSpan mein aapka swagat hai",
     "login_farmer": "Main ek Kisan / Seller hu",
     "login_buyer": "Main ek Khareedar / Merchant hu",
     "enter_name": "Apna poora naam darj karein",
@@ -64,7 +64,7 @@ const translations = {
     "mobile_number": "Mobile Number",
     "location": "Location (Shahar / Rajya)",
     "connecting": "Jud raha hai...",
-    "why_connect": "KisanConnect kyu chunein?",
+    "why_connect": "FarmSpan kyu chunein?",
     "search_marketplace": "Mandi Khojein aur Filter Karein",
     "search_crop": "Fasal ya Kisan ka naam likhein",
     "filter_location": "Location filter karein",
