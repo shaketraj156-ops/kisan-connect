@@ -45,11 +45,24 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
 
   const calculateLogistics = (sellerLoc) => {
     if (!sellerLoc || !user?.location) return { distance: 120, cost: 4800 };
-    if (sellerLoc.toLowerCase() === user.location.toLowerCase()) {
+    
+    const sLoc = sellerLoc.toLowerCase().trim();
+    const uLoc = user.location.toLowerCase().trim();
+    
+    if (sLoc === uLoc) {
       return { distance: 15, cost: 600 }; // Local transport
     }
-    // Pseudo-random distance for MVP demo
-    const dist = (sellerLoc.length * user.location.length * 10) + 150;
+    
+    // Create a stable hash from both strings to get a consistent distance
+    const combined = sLoc < uLoc ? sLoc + uLoc : uLoc + sLoc;
+    let hash = 0;
+    for (let i = 0; i < combined.length; i++) {
+      hash = ((hash << 5) - hash) + combined.charCodeAt(i);
+      hash = hash & hash; 
+    }
+    
+    // Generate a reasonable distance between 40 and 500 km
+    const dist = 40 + (Math.abs(hash) % 460);
     return { distance: dist, cost: dist * 40 }; // ₹40 per km
   };
 
