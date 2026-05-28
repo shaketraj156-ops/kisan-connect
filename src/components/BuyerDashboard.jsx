@@ -43,6 +43,39 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
     };
   };
 
+  const cityCoordinates = {
+    bhopal: { lat: 23.2599, lon: 77.4126 },
+    buxar: { lat: 25.5647, lon: 83.9777 },
+    delhi: { lat: 28.6139, lon: 77.2090 },
+    mumbai: { lat: 19.0760, lon: 72.8777 },
+    indore: { lat: 22.7196, lon: 75.8577 },
+    patna: { lat: 25.5941, lon: 85.1376 },
+    lucknow: { lat: 26.8467, lon: 80.9462 },
+    jaipur: { lat: 26.9124, lon: 75.7873 },
+    sehore: { lat: 23.2032, lon: 77.0845 },
+    pune: { lat: 18.5204, lon: 73.8567 },
+    kanpur: { lat: 26.4499, lon: 80.3319 },
+    nagpur: { lat: 21.1458, lon: 79.0882 },
+    ahmedabad: { lat: 23.0225, lon: 72.5714 },
+    surat: { lat: 21.1702, lon: 72.8311 },
+    kolkata: { lat: 22.5726, lon: 88.3639 },
+    chennai: { lat: 13.0827, lon: 80.2707 },
+    hyderabad: { lat: 17.3850, lon: 78.4867 },
+    agra: { lat: 27.1767, lon: 78.0081 },
+    varanasi: { lat: 25.3176, lon: 82.9739 }
+  };
+
+  const getRealDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth radius in km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Math.round((R * c) * 1.3); // Multiply by 1.3 to estimate actual road distance
+  };
+
   const calculateLogistics = (sellerLoc) => {
     if (!sellerLoc || !user?.location) return { distance: 120, cost: 4800 };
     
@@ -53,16 +86,25 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
       return { distance: 15, cost: 600 }; // Local transport
     }
     
-    // Create a stable hash from both strings to get a consistent distance
-    const combined = sLoc < uLoc ? sLoc + uLoc : uLoc + sLoc;
-    let hash = 0;
-    for (let i = 0; i < combined.length; i++) {
-      hash = ((hash << 5) - hash) + combined.charCodeAt(i);
-      hash = hash & hash; 
+    // Check if we have real coordinates for both cities
+    let dist = 0;
+    if (cityCoordinates[sLoc] && cityCoordinates[uLoc]) {
+      dist = getRealDistance(
+        cityCoordinates[sLoc].lat, cityCoordinates[sLoc].lon,
+        cityCoordinates[uLoc].lat, cityCoordinates[uLoc].lon
+      );
+    } else {
+      // Fallback: Create a stable hash from both strings
+      const combined = sLoc < uLoc ? sLoc + uLoc : uLoc + sLoc;
+      let hash = 0;
+      for (let i = 0; i < combined.length; i++) {
+        hash = ((hash << 5) - hash) + combined.charCodeAt(i);
+        hash = hash & hash; 
+      }
+      // Generate a distance between 80 and 1200 km for unknown cities
+      dist = 80 + (Math.abs(hash) % 1120);
     }
-    
-    // Generate a reasonable distance between 40 and 500 km
-    const dist = 40 + (Math.abs(hash) % 460);
+
     return { distance: dist, cost: dist * 40 }; // ₹40 per km
   };
 
