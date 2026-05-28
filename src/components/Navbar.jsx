@@ -10,7 +10,7 @@ export default function Navbar({ user, onLogout, activeTab, setActiveTab }) {
         <div style={styles.logoCircle}>
           <Leaf size={18} color="#fff" />
         </div>
-        <h2 style={styles.logoText}>Kisan<span>Connect</span></h2>
+        <h2 style={styles.logoText}>Farm<span>Span</span></h2>
       </div>
 
       {user && setActiveTab && (

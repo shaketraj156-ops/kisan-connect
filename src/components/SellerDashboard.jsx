@@ -25,7 +25,7 @@ export default function SellerDashboard({ user, listings, onAddListing, onDelete
   const [predictedIncrease, setPredictedIncrease] = useState(150);
 
   const triggerMockWhatsApp = () => {
-    const message = `Namaste KisanConnect! Main ${user.name} hu. Mujhe apne ${user.location} location ke liye ${crop} ke daily price alerts chahiye.`;
+    const message = `Namaste FarmSpan! Main ${user.name} hu. Mujhe apne ${user.location} location ke liye ${crop} ke daily price alerts chahiye.`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
   };
   

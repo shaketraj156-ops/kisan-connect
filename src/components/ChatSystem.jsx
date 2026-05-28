@@ -109,7 +109,7 @@ export default function ChatSystem({ activeChat, user, onUpdateChat, onClose }) 
       <div style={styles.advisoryBanner}>
         <ShieldAlert size={14} color="var(--accent)" style={{ flexShrink: 0 }} />
         <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-          KisanConnect Advisory: Live market rates are around <strong>₹{activeChat.mandiPrice}/q</strong>. Stay close to market trends for a fair deal.
+          FarmSpan Advisory: Live market rates are around <strong>₹{activeChat.mandiPrice}/q</strong>. Stay close to market trends for a fair deal.
         </span>
       </div>
 

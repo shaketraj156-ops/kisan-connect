@@ -91,7 +91,7 @@ export default function AuthPortal({ onLoginSuccess }) {
           <div style={styles.logoCircle}>
             <Leaf size={32} color="#10b981" fill="#10b981" style={{ opacity: 0.8 }} />
           </div>
-          <h1 style={styles.title}>Kisan<span>Connect</span></h1>
+          <h1 style={styles.title}>Farm<span>Span</span></h1>
           <p style={styles.subtitle}>Direct Farmer-to-Market Digital Network</p>
         </div>
 
