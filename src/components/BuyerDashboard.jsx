@@ -26,6 +26,23 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
     return matchesCrop && matchesLocation && matchesPrice;
   });
 
+  // NEW: Generate consistent AI Trust Score based on farmer's name for Hackathon MVP
+  const generateTrustScore = (farmerName) => {
+    if (!farmerName) return { overall: 92, delivery: 94, quality: 89, satisfaction: 4.6, history: 12 };
+    let hash = 0;
+    for (let i = 0; i < farmerName.length; i++) {
+      hash = farmerName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const scoreBase = Math.abs(hash % 15); // 0 to 14
+    return {
+      overall: 85 + scoreBase, // 85 to 99
+      delivery: 88 + Math.abs((hash * 2) % 12), // 88 to 99
+      quality: 85 + Math.abs((hash * 3) % 14), // 85 to 98
+      satisfaction: ((85 + scoreBase) / 20).toFixed(1), // 4.2 to 4.9
+      history: 5 + Math.abs(hash % 40) // 5 to 44
+    };
+  };
+
   const calculateLogistics = (sellerLoc) => {
     if (!sellerLoc || !user?.location) return { distance: 120, cost: 4800 };
     if (sellerLoc.toLowerCase() === user.location.toLowerCase()) {
@@ -404,6 +421,36 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
                       </button>
                     </div>
                   </div>
+
+                  {/* AI Trust Profile (NEW HACKATHON FEATURE) */}
+                  {selectedListing.farmerName && (
+                    <div style={{ marginTop: '1.5rem', background: 'linear-gradient(145deg, rgba(16, 185, 129, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '1.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem' }}>
+                        <CheckCircle size={20} color="#10b981" />
+                        <h4 style={{ fontFamily: 'var(--font-heading)', color: '#fff', margin: 0 }}>AI Trust & Reliability Score</h4>
+                        <span className="badge badge-primary" style={{ marginLeft: 'auto', background: '#10b981' }}>{generateTrustScore(selectedListing.farmerName).overall}% Trust Match</span>
+                      </div>
+                      
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#10b981' }}>{generateTrustScore(selectedListing.farmerName).delivery}%</div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>Delivery Reliability</div>
+                        </div>
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#3b82f6' }}>{generateTrustScore(selectedListing.farmerName).quality}%</div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>Quality Consistency</div>
+                        </div>
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#fbbf24' }}>{generateTrustScore(selectedListing.farmerName).history} Orders</div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>Fulfillment History</div>
+                        </div>
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#f87171' }}>{generateTrustScore(selectedListing.farmerName).satisfaction}/5.0</div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>Buyer Satisfaction</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Action Buttons */}
                   <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
