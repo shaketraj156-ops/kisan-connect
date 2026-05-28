@@ -198,7 +198,7 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
                 {/* Header */}
                 <div style={styles.cardTop}>
                   <div>
-                    <span className="badge badge-accent" style={{ marginBottom: '0.25rem' }}>
+                    <span className="badge badge-accent" style={{ marginBottom: '0.25rem', background: '#f59e0b', color: '#111827', border: 'none', fontWeight: 'bold' }}>
                       {listing.grade}
                     </span>
                     <h4 style={styles.cropTitle}>{listing.crop}</h4>
@@ -308,7 +308,7 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
               )}
               <div style={styles.imageOverlayGradient}></div>
               <div style={styles.modalHeaderInfo}>
-                <span className="badge badge-accent">{selectedListing.grade}</span>
+                <span className="badge badge-accent" style={{ background: '#f59e0b', color: '#111827', border: 'none', fontWeight: 'bold' }}>{selectedListing.grade}</span>
                 <h2 style={styles.modalCropTitle}>{selectedListing.crop}</h2>
                 <h3 style={styles.modalPriceTitle}>₹{selectedListing.askingPrice} / Quintal</h3>
               </div>
