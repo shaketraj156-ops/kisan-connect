@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, MapPin, DollarSign, Filter, MessageSquare, Phone, Truck, User, Eye, X, Image as ImageIcon, CreditCard, CheckCircle, Map as MapIcon, Navigation } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { openOrCreateChat } from '../utils/apiClient';
@@ -43,7 +43,7 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
     };
   };
 
-  const cityCoordinates = {
+  const [coordCache, setCoordCache] = useState({
     bhopal: { lat: 23.2599, lon: 77.4126 },
     buxar: { lat: 25.5647, lon: 83.9777 },
     delhi: { lat: 28.6139, lon: 77.2090 },
@@ -63,7 +63,48 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
     hyderabad: { lat: 17.3850, lon: 78.4867 },
     agra: { lat: 27.1767, lon: 78.0081 },
     varanasi: { lat: 25.3176, lon: 82.9739 }
-  };
+  });
+
+  useEffect(() => {
+    const fetchMissingCoords = async () => {
+      let hasNew = false;
+      const newCache = { ...coordCache };
+      const locationsToFetch = new Set();
+      
+      const userLoc = user?.location?.toLowerCase().trim();
+      if (userLoc && !newCache[userLoc]) locationsToFetch.add(userLoc);
+      
+      listings.forEach(lst => {
+        const sLoc = lst.location?.toLowerCase().trim();
+        if (sLoc && !newCache[sLoc]) locationsToFetch.add(sLoc);
+      });
+      
+      if (locationsToFetch.size === 0) return;
+
+      for (const loc of locationsToFetch) {
+        try {
+          const res = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${loc},IN&limit=1&appid=3702d85e96009bbc3e82425c15a2dba3`);
+          const data = await res.json();
+          if (data && data.length > 0) {
+            newCache[loc] = { lat: data[0].lat, lon: data[0].lon };
+            hasNew = true;
+          } else {
+            newCache[loc] = { notFound: true }; // Cache negative result to prevent retry
+            hasNew = true;
+          }
+        } catch (err) {
+          console.error("Geocoding failed for:", loc);
+        }
+      }
+      
+      if (hasNew) {
+        setCoordCache(newCache);
+      }
+    };
+    
+    fetchMissingCoords();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listings, user?.location]);
 
   const getRealDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Earth radius in km
@@ -88,10 +129,10 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
     
     // Check if we have real coordinates for both cities
     let dist = 0;
-    if (cityCoordinates[sLoc] && cityCoordinates[uLoc]) {
+    if (coordCache[sLoc] && !coordCache[sLoc].notFound && coordCache[uLoc] && !coordCache[uLoc].notFound) {
       dist = getRealDistance(
-        cityCoordinates[sLoc].lat, cityCoordinates[sLoc].lon,
-        cityCoordinates[uLoc].lat, cityCoordinates[uLoc].lon
+        coordCache[sLoc].lat, coordCache[sLoc].lon,
+        coordCache[uLoc].lat, coordCache[uLoc].lon
       );
     } else {
       // Fallback: Create a stable hash from both strings
