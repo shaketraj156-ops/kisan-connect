@@ -428,7 +428,7 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem' }}>
                         <CheckCircle size={20} color="#10b981" />
                         <h4 style={{ fontFamily: 'var(--font-heading)', color: '#fff', margin: 0 }}>AI Trust & Reliability Score</h4>
-                        <span className="badge badge-primary" style={{ marginLeft: 'auto', background: '#10b981' }}>{generateTrustScore(selectedListing.farmerName).overall}% Trust Match</span>
+                        <span className="badge badge-primary" style={{ marginLeft: 'auto', background: '#10b981', color: '#ffffff', fontWeight: 'bold' }}>{generateTrustScore(selectedListing.farmerName).overall}% Trust Match</span>
                       </div>
                       
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
