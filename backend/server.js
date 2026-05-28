@@ -19,42 +19,33 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-const DB_FILE = path.join(__dirname, 'database.json');
+const mongoose = require('mongoose');
 
-// Helper to read DB
-const readDB = () => {
-  try {
-    const data = fs.readFileSync(DB_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (err) {
-    return { users: [], listings: [], chats: [] };
-  }
-};
-
-// Helper to write DB
-const writeDB = (data) => {
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
-};
-
-// Generate random ID
+// Generate random ID for backwards compatibility with frontend
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-console.log('✅ Connected to Local File Database (Hostel WiFi Safe!)');
+// Connect to MongoDB
+const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/kisanconnect';
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('✅ Connected to MongoDB Atlas (Persistent Data)'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
+// Schemas (Strict: false allows any fields, acting like NoSQL documents)
+const User = mongoose.model('User', new mongoose.Schema({ _id: String }, { strict: false }));
+const Listing = mongoose.model('Listing', new mongoose.Schema({ _id: String, createdAt: Date }, { strict: false }));
+const Chat = mongoose.model('Chat', new mongoose.Schema({ _id: String, messages: Array }, { strict: false }));
 
 // ================= API ROUTES =================
 
 // 1. Auth/Login Route
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
   try {
     const { name, phone, location, role } = req.body;
-    const db = readDB();
-    
-    let user = db.users.find(u => u.phone === phone && u.role === role);
+    let user = await User.findOne({ phone, role });
     
     if (!user) {
-      user = { _id: generateId(), name, phone, location, role };
-      db.users.push(user);
-      writeDB(db);
+      user = new User({ _id: generateId(), name, phone, location, role });
+      await user.save();
     }
     
     res.status(200).json(user);
@@ -64,23 +55,20 @@ app.post('/api/login', (req, res) => {
 });
 
 // 2. Get All Listings
-app.get('/api/listings', (req, res) => {
+app.get('/api/listings', async (req, res) => {
   try {
-    const db = readDB();
-    // Reverse array to show newest first
-    res.status(200).json([...db.listings].reverse());
+    const listings = await Listing.find().sort({ createdAt: -1 });
+    res.status(200).json(listings);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
 // 3. Create New Listing
-app.post('/api/listings', (req, res) => {
+app.post('/api/listings', async (req, res) => {
   try {
-    const db = readDB();
-    const newListing = { _id: generateId(), ...req.body, createdAt: new Date() };
-    db.listings.push(newListing);
-    writeDB(db);
+    const newListing = new Listing({ _id: generateId(), ...req.body, createdAt: new Date() });
+    await newListing.save();
     res.status(201).json(newListing);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -88,16 +76,13 @@ app.post('/api/listings', (req, res) => {
 });
 
 // 4. Delete Listing
-app.delete('/api/listings/:id', (req, res) => {
+app.delete('/api/listings/:id', async (req, res) => {
   try {
-    const db = readDB();
     const { id } = req.params;
-    const initialLength = db.listings.length;
-    db.listings = db.listings.filter(l => l._id !== id);
-    if (db.listings.length === initialLength) {
+    const result = await Listing.deleteOne({ _id: id });
+    if (result.deletedCount === 0) {
       return res.status(404).json({ error: 'Listing not found' });
     }
-    writeDB(db);
     res.status(200).json({ message: 'Listing deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -105,33 +90,30 @@ app.delete('/api/listings/:id', (req, res) => {
 });
 
 // 5. Get Chats for a specific user
-app.get('/api/chats/:userId', (req, res) => {
+app.get('/api/chats/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const db = readDB();
-    const chats = db.chats.filter(c => c.buyerId === userId || c.farmerId === userId).reverse();
-    res.status(200).json(chats);
+    const chats = await Chat.find({ $or: [{ buyerId: userId }, { farmerId: userId }] });
+    res.status(200).json(chats.reverse());
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// 5. Create or Get Chat
-app.post('/api/chats', (req, res) => {
+// 6. Create or Get Chat
+app.post('/api/chats', async (req, res) => {
   try {
-    const db = readDB();
     const { buyerId, buyerName, farmerId, farmerName, listingId, crop, askingPrice, mandiPrice, initialMessage } = req.body;
     
-    let chat = db.chats.find(c => c.buyerId === buyerId && c.farmerId === farmerId && c.listingId === listingId);
+    let chat = await Chat.findOne({ buyerId, farmerId, listingId });
     
     if (!chat) {
-      chat = {
+      chat = new Chat({
         _id: generateId(),
         buyerId, buyerName, farmerId, farmerName, listingId, crop, askingPrice, mandiPrice,
         messages: [initialMessage]
-      };
-      db.chats.push(chat);
-      writeDB(db);
+      });
+      await chat.save();
     }
     res.status(200).json(chat);
   } catch (error) {
@@ -139,20 +121,20 @@ app.post('/api/chats', (req, res) => {
   }
 });
 
-// 6. Add Message to Chat
-app.post('/api/chats/:chatId/message', (req, res) => {
+// 7. Add Message to Chat
+app.post('/api/chats/:chatId/message', async (req, res) => {
   try {
     const { chatId } = req.params;
     const { sender, text, timestamp } = req.body;
-    const db = readDB();
     
-    const chatIndex = db.chats.findIndex(c => c._id === chatId);
-    if (chatIndex === -1) return res.status(404).json({ error: 'Chat not found' });
+    const chat = await Chat.findOneAndUpdate(
+      { _id: chatId },
+      { $push: { messages: { sender, text, timestamp } } },
+      { new: true }
+    );
     
-    db.chats[chatIndex].messages.push({ sender, text, timestamp });
-    writeDB(db);
-    
-    res.status(200).json(db.chats[chatIndex]);
+    if (!chat) return res.status(404).json({ error: 'Chat not found' });
+    res.status(200).json(chat);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
