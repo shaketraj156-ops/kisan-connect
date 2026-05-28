@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, MapPin, DollarSign, Filter, MessageSquare, Phone, Truck, User, Eye, X, Image as ImageIcon, CreditCard, CheckCircle, Map as MapIcon, Navigation } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { openOrCreateChat } from '../utils/apiClient';
@@ -43,68 +43,7 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
     };
   };
 
-  const [coordCache, setCoordCache] = useState({
-    bhopal: { lat: 23.2599, lon: 77.4126 },
-    buxar: { lat: 25.5647, lon: 83.9777 },
-    delhi: { lat: 28.6139, lon: 77.2090 },
-    mumbai: { lat: 19.0760, lon: 72.8777 },
-    indore: { lat: 22.7196, lon: 75.8577 },
-    patna: { lat: 25.5941, lon: 85.1376 },
-    lucknow: { lat: 26.8467, lon: 80.9462 },
-    jaipur: { lat: 26.9124, lon: 75.7873 },
-    sehore: { lat: 23.2032, lon: 77.0845 },
-    pune: { lat: 18.5204, lon: 73.8567 },
-    kanpur: { lat: 26.4499, lon: 80.3319 },
-    nagpur: { lat: 21.1458, lon: 79.0882 },
-    ahmedabad: { lat: 23.0225, lon: 72.5714 },
-    surat: { lat: 21.1702, lon: 72.8311 },
-    kolkata: { lat: 22.5726, lon: 88.3639 },
-    chennai: { lat: 13.0827, lon: 80.2707 },
-    hyderabad: { lat: 17.3850, lon: 78.4867 },
-    agra: { lat: 27.1767, lon: 78.0081 },
-    varanasi: { lat: 25.3176, lon: 82.9739 }
-  });
 
-  useEffect(() => {
-    const fetchMissingCoords = async () => {
-      let hasNew = false;
-      const newCache = { ...coordCache };
-      const locationsToFetch = new Set();
-      
-      const userLoc = user?.location?.toLowerCase().trim();
-      if (userLoc && !newCache[userLoc]) locationsToFetch.add(userLoc);
-      
-      listings.forEach(lst => {
-        const sLoc = lst.location?.toLowerCase().trim();
-        if (sLoc && !newCache[sLoc]) locationsToFetch.add(sLoc);
-      });
-      
-      if (locationsToFetch.size === 0) return;
-
-      for (const loc of locationsToFetch) {
-        try {
-          const res = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${loc},IN&limit=1&appid=3702d85e96009bbc3e82425c15a2dba3`);
-          const data = await res.json();
-          if (data && data.length > 0) {
-            newCache[loc] = { lat: data[0].lat, lon: data[0].lon };
-            hasNew = true;
-          } else {
-            newCache[loc] = { notFound: true }; // Cache negative result to prevent retry
-            hasNew = true;
-          }
-        } catch (err) {
-          console.error("Geocoding failed for:", loc);
-        }
-      }
-      
-      if (hasNew) {
-        setCoordCache(newCache);
-      }
-    };
-    
-    fetchMissingCoords();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listings, user?.location]);
 
   const getRealDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Earth radius in km
@@ -117,7 +56,8 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
     return Math.round((R * c) * 1.3); // Multiply by 1.3 to estimate actual road distance
   };
 
-  const calculateLogistics = (sellerLoc) => {
+  const calculateLogistics = (listingItem) => {
+    const sellerLoc = listingItem?.location;
     if (!sellerLoc || !user?.location) return { distance: 120, cost: 4800 };
     
     const sLoc = sellerLoc.toLowerCase().trim();
@@ -127,22 +67,18 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
       return { distance: 15, cost: 600 }; // Local transport
     }
     
-    // Check if we have real coordinates for both cities
     let dist = 0;
-    if (coordCache[sLoc] && !coordCache[sLoc].notFound && coordCache[uLoc] && !coordCache[uLoc].notFound) {
-      dist = getRealDistance(
-        coordCache[sLoc].lat, coordCache[sLoc].lon,
-        coordCache[uLoc].lat, coordCache[uLoc].lon
-      );
+    // Check if backend provided coordinates
+    if (listingItem.lat && listingItem.lon && user.lat && user.lon) {
+      dist = getRealDistance(listingItem.lat, listingItem.lon, user.lat, user.lon);
     } else {
-      // Fallback: Create a stable hash from both strings
+      // Fallback: Create a stable hash from both strings (for legacy listings without coords)
       const combined = sLoc < uLoc ? sLoc + uLoc : uLoc + sLoc;
       let hash = 0;
       for (let i = 0; i < combined.length; i++) {
         hash = ((hash << 5) - hash) + combined.charCodeAt(i);
         hash = hash & hash; 
       }
-      // Generate a distance between 80 and 1200 km for unknown cities
       dist = 80 + (Math.abs(hash) % 1120);
     }
 
@@ -316,7 +252,7 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
                   </div>
                   <div style={{ ...styles.detailRow, color: '#d97706', marginTop: '4px', background: 'rgba(251, 191, 36, 0.1)', padding: '6px', borderRadius: '6px' }}>
                     <Truck size={14} color="#d97706" />
-                    <span>Logistics Est: <strong>{calculateLogistics(listing.location).distance} km</strong> (₹{calculateLogistics(listing.location).cost})</span>
+                    <span>Logistics Est: <strong>{calculateLogistics(listing).distance} km</strong> (₹{calculateLogistics(listing).cost})</span>
                   </div>
                 </div>
 
@@ -439,11 +375,11 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
                       <div style={{ background: 'rgba(16,185,129,0.1)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.2)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                           <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Estimated Distance:</span>
-                          <strong style={{ color: '#fff' }}>{calculateLogistics(selectedListing.location).distance} km</strong>
+                          <strong style={{ color: '#fff' }}>{calculateLogistics(selectedListing).distance} km</strong>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Transport Cost (Estimated):</span>
-                          <strong style={{ color: '#fbbf24' }}>₹{calculateLogistics(selectedListing.location).cost}</strong>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Est. Cost:</span>
+                          <strong style={{ color: '#fbbf24' }}>₹{calculateLogistics(selectedListing).cost}</strong>
                         </div>
                       </div>
                       

@@ -45,6 +45,21 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Helper for geocoding
+async function getCoords(location) {
+  if (!location) return null;
+  try {
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&format=json`);
+    const data = await res.json();
+    if (data?.results?.length > 0) {
+      return { lat: data.results[0].latitude, lon: data.results[0].longitude };
+    }
+  } catch (err) {
+    console.error("Geocoding failed for", location, err);
+  }
+  return null;
+}
+
 // 1. Auth/Login Route
 app.post('/api/login', async (req, res) => {
   try {
@@ -52,8 +67,26 @@ app.post('/api/login', async (req, res) => {
     let user = await User.findOne({ phone, role });
     
     if (!user) {
-      user = new User({ _id: generateId(), name, phone, location, role });
+      const coords = await getCoords(location);
+      user = new User({ 
+        _id: generateId(), 
+        name, phone, location, role,
+        lat: coords?.lat, lon: coords?.lon
+      });
       await user.save();
+    } else if (user.location !== location || !user.lat) {
+      // If location changed or coords missing, update them
+      const coords = await getCoords(location);
+      if (coords) {
+        user.location = location;
+        user.lat = coords.lat;
+        user.lon = coords.lon;
+        await User.updateOne({ _id: user._id }, { $set: { location, lat: coords.lat, lon: coords.lon } });
+      } else if (user.location !== location) {
+        // Still update location even if geocoding failed
+        user.location = location;
+        await User.updateOne({ _id: user._id }, { $set: { location } });
+      }
     }
     
     res.status(200).json(user);
@@ -75,7 +108,14 @@ app.get('/api/listings', async (req, res) => {
 // 3. Create New Listing
 app.post('/api/listings', async (req, res) => {
   try {
-    const newListing = new Listing({ _id: generateId(), ...req.body, createdAt: new Date() });
+    const coords = await getCoords(req.body.location);
+    const newListing = new Listing({ 
+      _id: generateId(), 
+      ...req.body, 
+      lat: coords?.lat, 
+      lon: coords?.lon,
+      createdAt: new Date() 
+    });
     await newListing.save();
     res.status(201).json(newListing);
   } catch (error) {
