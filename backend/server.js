@@ -26,7 +26,7 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 
 // Connect to MongoDB
 const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/kisanconnect';
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoURI)
   .then(() => console.log('✅ Connected to MongoDB Atlas (Persistent Data)'))
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -36,6 +36,14 @@ const Listing = mongoose.model('Listing', new mongoose.Schema({ _id: String, cre
 const Chat = mongoose.model('Chat', new mongoose.Schema({ _id: String, messages: Array }, { strict: false }));
 
 // ================= API ROUTES =================
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    mongoUriLoaded: !!process.env.MONGO_URI,
+    mongoConnected: mongoose.connection.readyState === 1
+  });
+});
 
 // 1. Auth/Login Route
 app.post('/api/login', async (req, res) => {
