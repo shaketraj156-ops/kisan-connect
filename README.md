@@ -18,15 +18,15 @@
 *(Upload your screenshots here! Name your files `screenshot1.png`, `screenshot2.png` and save them in the root folder of this project!)*
 
 <div align="center">
-  <img src="./screenshot1.png" alt="Home Dashboard" width="45%" />
+  <img src="./Screenshot1.png" alt="Home Dashboard" width="45%" />
   &nbsp; &nbsp;
-  <img src="./screenshot2.png" alt="Marketplace" width="45%" />
+  <img src="./Screenshot2.png" alt="Marketplace" width="45%" />
 </div>
 
 <div align="center">
-  <img src="./screenshot3.png" alt="AI Disease Detector" width="45%" />
+  <img src="./Screenshot3.png" alt="AI Disease Detector" width="45%" />
   &nbsp; &nbsp;
-  <img src="./screenshot4.png" alt="Real-time Chat" width="45%" />
+  <img src="./Screenshot4.png" alt="Real-time Chat" width="45%" />
 </div>
 
 ---
