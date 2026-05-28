@@ -100,35 +100,50 @@ export default function SellerDashboard({ user, listings, onAddListing, onDelete
 
     let photoBase64 = null;
     if (photo) {
-      photoBase64 = await new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 800;
-          const MAX_HEIGHT = 800;
-          let width = img.width;
-          let height = img.height;
+      try {
+        photoBase64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+              try {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const MAX_HEIGHT = 800;
+                let width = img.width;
+                let height = img.height;
 
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height = Math.round((height *= MAX_WIDTH / width));
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width = Math.round((width *= MAX_HEIGHT / height));
-              height = MAX_HEIGHT;
-            }
-          }
+                if (width > height) {
+                  if (width > MAX_WIDTH) {
+                    height = Math.round((height *= MAX_WIDTH / width));
+                    width = MAX_WIDTH;
+                  }
+                } else {
+                  if (height > MAX_HEIGHT) {
+                    width = Math.round((width *= MAX_HEIGHT / height));
+                    height = MAX_HEIGHT;
+                  }
+                }
 
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', 0.7)); // 70% quality compression
-        };
-        img.src = URL.createObjectURL(photo);
-      });
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+              } catch (err) {
+                // If canvas fails (memory/security), fallback to raw base64
+                resolve(event.target.result);
+              }
+            };
+            img.onerror = () => resolve(event.target.result); // Fallback if image parse fails
+            img.src = event.target.result;
+          };
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(photo);
+        });
+      } catch (e) {
+        photoBase64 = null;
+      }
     }
 
     const finalCropName = crop === 'Other' ? customCrop || 'Unknown Crop' : crop;
@@ -415,8 +430,8 @@ export default function SellerDashboard({ user, listings, onAddListing, onDelete
               />
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem', justifyContent: 'center' }}>
-              <Plus size={18} /> {t('post_listing')}
+            <button type="submit" className="btn btn-primary" disabled={isSubmitting} style={{ width: '100%', marginTop: '0.5rem', justifyContent: 'center' }}>
+              {isSubmitting ? <><Loader size={18} className="animate-spin" /> Uploading...</> : <><Plus size={18} /> {t('post_listing')}</>}
             </button>
           </form>
         </div>
