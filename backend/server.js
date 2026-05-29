@@ -49,12 +49,11 @@ app.get('/api/health', (req, res) => {
 async function getCoords(location) {
   if (!location) return null;
   try {
-    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`, {
-      headers: { 'User-Agent': 'KisanConnectApp/1.0' }
-    });
+    const city = location.split(/[, \-]+/)[0];
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&format=json`);
     const data = await res.json();
-    if (data && data.length > 0) {
-      return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+    if (data?.results?.length > 0) {
+      return { lat: data.results[0].latitude, lon: data.results[0].longitude };
     }
   } catch (err) {
     console.error("Geocoding failed for", location, err);
