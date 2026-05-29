@@ -196,9 +196,16 @@ app.post('/api/analyze-disease', async (req, res) => {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `You are an expert Indian Agronomist. 
-    Analyze this image of a crop/plant.
-    Identify the crop and any visible disease.
-    If it's not a crop, state that.
+    Analyze this image.
+    FIRST RULE: If the image DOES NOT contain a plant, crop, leaf, or agricultural field, you MUST return this exact JSON:
+    {
+      "disease": "Not a Plant/Crop",
+      "confidence": "100%",
+      "description": "The uploaded image does not appear to contain any plant, crop, or leaf.",
+      "action": "Please upload a clear photo of an agricultural crop for analysis."
+    }
+    
+    If it IS a plant, identify the crop and any visible disease.
     Return ONLY a raw JSON object with no markdown formatting. The JSON must have these exact keys:
     {
       "disease": "Name of crop and disease (e.g. Tomato Early Blight) or 'Healthy'",
