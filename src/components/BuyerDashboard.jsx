@@ -15,6 +15,46 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
   const [paymentListing, setPaymentListing] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('UPI');
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // OSRM Distances State
+  const [osrmDistances, setOsrmDistances] = useState({});
+
+  // Fetch Real Road Distances asynchronously via OSRM
+  React.useEffect(() => {
+    const fetchDistances = async () => {
+      if (!user?.lat || !user?.lon) return;
+
+      const newDistances = { ...osrmDistances };
+      let changed = false;
+
+      for (const lst of listings) {
+        if (!lst.lat || !lst.lon) continue;
+        
+        const key = lst._id || lst.id;
+        if (newDistances[key]) continue; // Already calculated
+        
+        try {
+          // OSRM expects: longitude,latitude
+          const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${user.lon},${user.lat};${lst.lon},${lst.lat}?overview=false`);
+          const data = await res.json();
+          
+          if (data.code === 'Ok' && data.routes.length > 0) {
+            const distKm = Math.round(data.routes[0].distance / 1000);
+            newDistances[key] = distKm;
+            changed = true;
+          }
+        } catch (err) {
+          console.error("OSRM API failed for", lst.crop, err);
+        }
+      }
+      
+      if (changed) {
+        setOsrmDistances(newDistances);
+      }
+    };
+    
+    fetchDistances();
+  }, [listings, user, osrmDistances]);
 
   // Filter listings based on user inputs
   const filteredListings = listings.filter(lst => {
@@ -68,13 +108,15 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
       return { distance: 15, cost: 600 }; // Local transport
     }
     
-    let dist = 0;
-    // Check if backend provided coordinates
-    if (listingItem.lat && listingItem.lon && user.lat && user.lon) {
+    let dist = 250;
+    
+    const key = listingItem?._id || listingItem?.id;
+    if (key && osrmDistances[key]) {
+      // Use highly accurate OSRM road distance
+      dist = osrmDistances[key];
+    } else if (listingItem.lat && listingItem.lon && user.lat && user.lon) {
+      // Fallback to Haversine if OSRM is loading or fails
       dist = getRealDistance(listingItem.lat, listingItem.lon, user.lat, user.lon);
-    } else {
-      // Fallback: If no coords, use a standard estimate instead of random hash to avoid crazy numbers
-      dist = 250;
     }
 
     return { distance: dist, cost: dist * 40 }; // ₹40 per km
