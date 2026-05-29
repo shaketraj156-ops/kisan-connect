@@ -63,7 +63,8 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
     const sLoc = sellerLoc.toLowerCase().trim();
     const uLoc = user.location.toLowerCase().trim();
     
-    if (sLoc === uLoc) {
+    // Partial string match for local cities (e.g. "Bhopal MP" and "Bhopal")
+    if (sLoc === uLoc || sLoc.includes(uLoc) || uLoc.includes(sLoc)) {
       return { distance: 15, cost: 600 }; // Local transport
     }
     
@@ -72,14 +73,8 @@ export default function BuyerDashboard({ user, listings, onOpenChat, activeChats
     if (listingItem.lat && listingItem.lon && user.lat && user.lon) {
       dist = getRealDistance(listingItem.lat, listingItem.lon, user.lat, user.lon);
     } else {
-      // Fallback: Create a stable hash from both strings (for legacy listings without coords)
-      const combined = sLoc < uLoc ? sLoc + uLoc : uLoc + sLoc;
-      let hash = 0;
-      for (let i = 0; i < combined.length; i++) {
-        hash = ((hash << 5) - hash) + combined.charCodeAt(i);
-        hash = hash & hash; 
-      }
-      dist = 80 + (Math.abs(hash) % 1120);
+      // Fallback: If no coords, use a standard estimate instead of random hash to avoid crazy numbers
+      dist = 250;
     }
 
     return { distance: dist, cost: dist * 40 }; // ₹40 per km
