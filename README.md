@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="https://img.icons8.com/fluency/96/tractor.png" alt="FarmoSpan Logo" width="80" />
+  <img src="https://img.icons8.com/fluency/96/tractor.png" alt="theFarmoSpan Logo" width="80" />
   
-  # FarmoSpan (formerly KisanConnect) 🌾
+  # theFarmoSpan (formerly KisanConnect) 🌾
   
   **Empowering Indian Farmers through Direct Market Access, AI, & Real-Time Logistics.**
   
@@ -35,9 +35,9 @@
 
 Indian farmers face immense challenges due to multiple layers of middlemen, resulting in them receiving a fraction of the actual market value of their crops. Furthermore, lack of real-time market data, logistics cost estimation, and crop health awareness keep them locked in a cycle of low profitability.
 
-## 💡 Our Solution: FarmoSpan
+## 💡 Our Solution: theFarmoSpan
 
-**FarmoSpan** is a unified digital ecosystem that bridges the gap between farmers and direct buyers/businesses. We eliminate middlemen while providing powerful tools like **AI Disease Detection**, **Live Gov. Mandi Rate APIs**, and **Real-time Geo-logistics**.
+**theFarmoSpan** is a unified digital ecosystem that bridges the gap between farmers and direct buyers/businesses. We eliminate middlemen while providing powerful tools like **AI Disease Detection**, **Live Gov. Mandi Rate APIs**, and **Real-time Geo-logistics**.
 
 ---
 
@@ -73,9 +73,9 @@ Indian farmers face immense challenges due to multiple layers of middlemen, resu
 
 ---
 
-## 🧠 Why FarmoSpan Wins
+## 🧠 Why theFarmoSpan Wins
 
-FarmoSpan is not just a UI mockup. It is a **fully functional, robust, and scalable architecture**. By offloading heavy tasks like Geocoding to the backend, and utilizing geographical formulas (Haversine) over static approximations, we provide a lightning-fast, production-ready solution tailored specifically for the Indian agricultural landscape.
+theFarmoSpan is not just a UI mockup. It is a **fully functional, robust, and scalable architecture**. By offloading heavy tasks like Geocoding to the backend, and utilizing geographical formulas (Haversine) over static approximations, we provide a lightning-fast, production-ready solution tailored specifically for the Indian agricultural landscape.
 
 ---
 
