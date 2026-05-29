@@ -84,7 +84,9 @@ theFarmoSpan is not just a UI mockup. It is a **fully functional, robust, and sc
 | Name | Role |
 | :--- | :--- |
 | **Shreya Pardhi** | Team Leader, UI & UX Developer |
-| **Shaket Raj** | Lead Full Stack Developer |
+| **Shaket Raj** | Full Stack Developer |
+| **Siddharth Saurabh** | Frontend Developer |
+| **Shashank Tyagi** | Backend Developer |
 
 ---
 
