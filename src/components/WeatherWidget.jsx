@@ -13,27 +13,36 @@ export default function WeatherWidget({ location }) {
     const fetchWeather = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${API_KEY}`);
+        // 1. Get Coordinates using Open-Meteo Geocoding
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&format=json`);
+        const geoData = await geoRes.json();
         
-        if (!res.ok) {
-          throw new Error('API Error or Key not active yet');
+        if (!geoData.results || geoData.results.length === 0) {
+          throw new Error('Location not found');
         }
+        
+        const { latitude, longitude, name } = geoData.results[0];
 
-        const data = await res.json();
+        // 2. Get Weather using Open-Meteo Weather API
+        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=relative_humidity_2m`);
+        const weatherData = await weatherRes.json();
         
-        // Map OpenWeather data to our UI format
-        const temp = Math.round(data.main.temp);
-        const humidity = data.main.humidity;
-        const wind = Math.round(data.wind.speed * 3.6); // convert m/s to km/h
-        const mainCondition = data.weather[0].main; // e.g. Rain, Clouds, Clear
+        const current = weatherData.current_weather;
+        const temp = Math.round(current.temperature);
+        const wind = Math.round(current.windspeed);
         
+        // Open-Meteo doesn't have current humidity, so we take the first hourly value
+        const humidity = weatherData.hourly.relative_humidity_2m[0] || 50; 
+        
+        // Map WMO Weather codes to conditions
+        const code = current.weathercode;
         let condition = 'Sunny & Clear';
         let advice = "Clear weather window for the next few days. Good time to harvest and transport.";
         
-        if (mainCondition === 'Rain' || mainCondition === 'Drizzle' || mainCondition === 'Thunderstorm') {
+        if (code >= 51 && code <= 99) {
           condition = 'Rainy';
           advice = "Heavy rain expected. Ensure harvested crops are covered securely and avoid spraying pesticides.";
-        } else if (mainCondition === 'Clouds') {
+        } else if (code >= 1 && code <= 3) {
           condition = 'Partly Cloudy';
           advice = "Cloudy weather. Normal farming activities can continue.";
         }
@@ -45,7 +54,7 @@ export default function WeatherWidget({ location }) {
           condition,
           advice,
           isReal: true,
-          cityName: data.name
+          cityName: name
         });
 
       } catch (err) {
