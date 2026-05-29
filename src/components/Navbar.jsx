@@ -8,7 +8,7 @@ export default function Navbar({ user, onLogout, activeTab, setActiveTab }) {
     <nav style={styles.nav} className="glass-panel navbar">
       <div style={styles.brand} className="nav-brand">
         <div style={styles.logoCircle}>
-          <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+          <Leaf size={18} color="#fff" />
         </div>
         <h2 style={styles.logoText}>theFarmo<span>Span</span></h2>
       </div>

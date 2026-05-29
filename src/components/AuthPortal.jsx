@@ -89,7 +89,7 @@ export default function AuthPortal({ onLoginSuccess }) {
         {/* App Logo */}
         <div style={styles.header}>
           <div style={styles.logoCircle}>
-            <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+            <Leaf size={32} color="#10b981" fill="#10b981" style={{ opacity: 0.8 }} />
           </div>
           <h1 style={styles.title}>theFarmo<span>Span</span></h1>
           <p style={styles.subtitle}>Direct Farmer-to-Market Digital Network</p>
